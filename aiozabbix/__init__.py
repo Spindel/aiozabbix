@@ -53,7 +53,7 @@ class ZabbixAPI:
         self.id = 0
         self.do_login = None
 
-    async def do_request(self, method, params=None):
+    async def do_request(self, method, params=None, auth_retries=1):
         request_json = {
             'jsonrpc': '2.0',
             'method': method,
@@ -70,10 +70,10 @@ class ZabbixAPI:
         try:
             return await self.post_request(request_json)
         except ZabbixAPIException as exc:
-            if not self.is_auth_error(exc) or self.do_login is None:
-                raise
-            await self.do_login()
-            return await self.do_request(method, params)
+            if auth_retries > 0 and self.do_login and self.is_auth_error(exc):
+                await self.do_login()
+                return await self.do_request(method, params, auth_retries=auth_retries - 1)
+            raise
 
     async def post_request(self, request_json):
         response = await self.client_session.post(self.url,
