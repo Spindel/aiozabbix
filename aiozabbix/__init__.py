@@ -91,7 +91,7 @@ class ZabbixAPI:
         if 'error' in response_json:
             # Workaround for ZBX-9340, some errors don't contain 'data':
             if 'data' not in response_json['error']:
-                response_json['error']['data'] = 'No data'
+                response_json['error']['data'] = 'ZBX-9340: No data'
 
             err = response_json['error']
             msg = f"Error {err['code']}: {err['message']}, {err['data']}"
