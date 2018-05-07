@@ -21,8 +21,6 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301 USA
 
-import json
-
 import aiohttp
 
 
@@ -79,13 +77,13 @@ class ZabbixAPI:
 
     async def post_request(self, request_json):
         response = await self.client_session.post(self.url,
-                                                  data=json.dumps(request_json),
+                                                  json=request_json,
                                                   headers=self.HEADERS,
                                                   timeout=self.timeout)
         response.raise_for_status()
 
         try:
-            response_json = json.loads(await response.text())
+            response_json = await response.json()
         except ValueError as exc:
             raise ZabbixAPIException(f'Unable to parse JSON: {response.text}') from exc
 
