@@ -33,6 +33,7 @@ class ZabbixAPI:
 
     LOGIN_METHODS = ('user.login', 'user.authenticate')
     UNAUTHENTICATED_METHODS = ('apiinfo.version',) + LOGIN_METHODS
+    AUTH_ERROR_FRAGMENTS = ('authori', 'permission', 're-login')
 
     def __init__(self,
                  server='http://localhost/zabbix',
@@ -104,8 +105,8 @@ class ZabbixAPI:
 
     @classmethod
     def is_auth_error(cls, exc):
-        msg, code = exc.args
-        return code == -32602
+        err = str(exc).lower()
+        return any(x in err for x in cls.AUTH_ERROR_FRAGMENTS)
 
     async def login(self, user='', password=''):
         async def do_login():
