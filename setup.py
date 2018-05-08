@@ -9,5 +9,8 @@ setup(
     packages=find_packages(),
     install_requires=[
         'aiohttp',
-    ]
+    ],
+    setup_requires=[
+        'flake8',
+    ],
 )
