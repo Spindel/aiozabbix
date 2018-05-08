@@ -1,0 +1,13 @@
+image: registry.gitlab.com/modioab/base-image:fedora-27-build-master
+
+stages:
+    - test
+
+before_script:
+    - uname -a
+
+aiozabbix:check:
+    stage: test
+    script:
+        - pip3 install .
+        - python3 setup.py flake8
