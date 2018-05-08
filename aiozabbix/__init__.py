@@ -33,7 +33,11 @@ class ZabbixAPI:
 
     LOGIN_METHODS = ('user.login', 'user.authenticate')
     UNAUTHENTICATED_METHODS = ('apiinfo.version',) + LOGIN_METHODS
-    AUTH_ERROR_FRAGMENTS = ('authori', 'permission', 're-login')
+    AUTH_ERROR_FRAGMENTS = (
+        'authori',                   # From CLocalApiClient::authenticate
+        'permission',                # From CUser::checkAuthentication
+        're-login',                  # From many places
+    )
 
     def __init__(self,
                  server='http://localhost/zabbix',
@@ -105,6 +109,17 @@ class ZabbixAPI:
 
     @classmethod
     def is_auth_error(cls, exc):
+        """Determine if an error is an authorization error.
+
+        This makes a best effort attempt to recognize authentication
+        or authorization errors. Unfortunately the general JSON-RPC
+        error code -32602 (Invalid params) and the generic Zabbix
+        error -32500 are used for these types of errors.
+
+        The error messages may also be localized which could make this
+        check fail.
+        """
+
         err = str(exc).lower()
         return any(x in err for x in cls.AUTH_ERROR_FRAGMENTS)
 
