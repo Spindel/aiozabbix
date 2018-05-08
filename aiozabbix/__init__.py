@@ -86,7 +86,7 @@ class ZabbixAPI:
         try:
             response_json = await response.json()
         except ValueError as exc:
-            raise ZabbixAPIException(f'Unable to parse JSON: {response.text}') from exc
+            raise ZabbixAPIException(f'Unable to parse JSON: {response.text()}') from exc
 
         if 'error' in response_json:
             # Workaround for ZBX-9340, some errors don't contain 'data':
