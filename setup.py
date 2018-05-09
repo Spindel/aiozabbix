@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name='aiozabbix',
-    version='0.0.1',
+    version='1.0.0',
     description='Asynchronous Zabbix API Python interface',
     url='http://gitlab.com/ModioAB/aiozabbix',
     author='Modio AB',
