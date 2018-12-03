@@ -1,4 +1,4 @@
-image: registry.gitlab.com/modioab/base-image:fedora-27-build-master
+image: registry.gitlab.com/modioab/base-image/fedora-29/python:master
 
 stages:
     - test
