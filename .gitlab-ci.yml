@@ -9,5 +9,11 @@ before_script:
 aiozabbix:check:
     stage: test
     script:
-        - pip3 install .
+        - pip3 install .[testing]
         - python3 setup.py flake8
+
+aiozabbix:test:
+    stage: test
+    script:
+        - pip3 install .[testing]
+        - pytest --cov=aiozabbix

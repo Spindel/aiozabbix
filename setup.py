@@ -20,7 +20,12 @@ setup(
     install_requires=[
         'aiohttp',
     ],
-    setup_requires=[
-        'flake8',
-    ],
+    extras_require={
+        'testing': [
+            'flake8',
+            'pytest',
+            'pytest-aiohttp',
+            'pytest-cov',
+        ]
+    }
 )
