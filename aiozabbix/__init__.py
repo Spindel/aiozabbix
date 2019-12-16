@@ -4,7 +4,7 @@
 # Original Python Library is Copyright (C) 2009 Brett Lentz brett.lentz(at)gmail(dot)com
 #
 # Copyright (C) 2011-2018 Luke Cyca me(at)lukecyca(dot)com
-# Copyright (C) 2018 Modio AB
+# Copyright (C) 2018-2019 Modio AB
 #
 # This library is free software; you can redistribute it and/or modify
 # it under the terms of the GNU Lesser General Public License as
@@ -132,7 +132,7 @@ class ZabbixAPI:
         await self.do_login()
 
     async def confimport(self, confformat='', source='', rules=''):
-        return self.configuration.import_(format=confformat, source=source, rules=rules)
+        return await self.configuration.import_(format=confformat, source=source, rules=rules)
 
     def __getattr__(self, attr):
         return ZabbixAPIObjectClass(name=attr, parent=self)
