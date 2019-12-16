@@ -49,8 +49,12 @@ def mock_server_app():
 
 
 @pytest.fixture
-async def zapi(aiohttp_client, mock_server_app):
-    client_session = await aiohttp_client(mock_server_app)
+async def client_session(aiohttp_client, mock_server_app):
+    return await aiohttp_client(mock_server_app)
+
+
+@pytest.fixture
+async def zapi(client_session, mock_server_app):
     return ZabbixAPI(server="", client_session=client_session)
 
 
@@ -116,3 +120,43 @@ async def test_import_underscore_attr_should_be_rewritten(mock_server_app, zapi)
         "rules": {},
         "source": "<zabbix_export>...</zabbix_export>",
     }
+
+
+async def test_custom_headers_should_be_sent(mock_server_app, client_session):
+    zapi = ZabbixAPI(
+        server="", client_session=client_session, headers={"User-Agent": "zabbixapp"}
+    )
+
+    await zapi.apiinfo.version()
+
+    requests = mock_server_app["requests"]
+    assert len(requests) == 1
+    assert requests[0].headers["User-Agent"] == "zabbixapp"
+
+
+async def test_zabbix_api_copies_should_share_state_correctly(mock_server_app, client_session):
+    zapi = ZabbixAPI(
+        server="", client_session=client_session, headers={"User-Agent": "zabbixapp"}
+    )
+
+    await zapi.apiinfo.version()
+
+    zapi_with_extra_header = zapi.with_headers({"X-Extra-Header": "Yes"})
+    await zapi_with_extra_header.apiinfo.version()
+
+    await zapi.apiinfo.version()
+
+    requests = mock_server_app["requests"]
+    assert len(requests) == 3
+
+    assert requests[0].headers["User-Agent"] == "zabbixapp"
+    assert "X-Extra-Header" not in requests[0].headers
+
+    assert requests[1].headers["User-Agent"] == "zabbixapp"
+    assert requests[1].headers["X-Extra-Header"] == "Yes"
+
+    assert requests[2].headers["User-Agent"] == "zabbixapp"
+    assert "X-Extra-Header" not in requests[2].headers
+
+    request_ids = [(await r.json())["id"] for r in mock_server_app["requests"]]
+    assert request_ids == [0, 1, 2]

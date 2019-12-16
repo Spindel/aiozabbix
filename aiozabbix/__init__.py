@@ -29,7 +29,7 @@ class ZabbixAPIException(Exception):
 
 
 class ZabbixAPI:
-    HEADERS = {'Content-Type': 'application/json-rpc'}
+    DEFAULT_HEADERS = {'Content-Type': 'application/json-rpc'}
 
     LOGIN_METHODS = ('user.login', 'user.authenticate')
     UNAUTHENTICATED_METHODS = ('apiinfo.version',) + LOGIN_METHODS
@@ -43,7 +43,8 @@ class ZabbixAPI:
                  server='http://localhost/zabbix',
                  *,
                  timeout=None,
-                 client_session=None):
+                 client_session=None,
+                 headers=None):
 
         self.url = server + '/api_jsonrpc.php'
 
@@ -55,17 +56,36 @@ class ZabbixAPI:
         self.timeout = timeout
 
         self.auth = ''
-        self.id = 0
+        self.shared_state = {'next_jsonrpc_id': 0}
         self.do_login = None
+
+        self.headers = self.DEFAULT_HEADERS.copy()
+        if headers is not None:
+            self.headers.update(headers)
+
+    def with_headers(self, headers):
+        """Make a copy of the ZabbixAPI object which sets extra HTTP headers.
+
+        """
+        result = ZabbixAPI.__new__(ZabbixAPI)
+        result.url = self.url
+        result.client_session = self.client_session
+        result.timeout = self.timeout
+        result.auth = self.auth
+        result.shared_state = self.shared_state
+        result.do_login = self.do_login
+        result.headers = self.headers.copy()
+        result.headers.update(headers)
+        return result
 
     async def do_request(self, method, params=None, auth_retries=1):
         request_json = {
             'jsonrpc': '2.0',
             'method': method,
             'params': params or {},
-            'id': self.id,
+            'id': self.shared_state['next_jsonrpc_id'],
         }
-        self.id += 1
+        self.shared_state['next_jsonrpc_id'] += 1
 
         if method in self.UNAUTHENTICATED_METHODS:
             return await self.post_request(request_json)
@@ -83,7 +103,7 @@ class ZabbixAPI:
     async def post_request(self, request_json):
         response = await self.client_session.post(self.url,
                                                   json=request_json,
-                                                  headers=self.HEADERS,
+                                                  headers=self.headers,
                                                   timeout=self.timeout)
         response.raise_for_status()
 
