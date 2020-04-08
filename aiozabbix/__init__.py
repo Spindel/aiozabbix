@@ -96,7 +96,7 @@ class ZabbixAPI:
             return await self.post_request(request_json)
         except ZabbixAPIException as exc:
             if auth_retries > 0 and self.do_login and self.is_auth_error(exc):
-                await self.do_login()
+                await self.do_login(self)
                 return await self.do_request(method, params, auth_retries=auth_retries - 1)
             raise
 
@@ -144,12 +144,17 @@ class ZabbixAPI:
         return any(x in err for x in cls.AUTH_ERROR_FRAGMENTS)
 
     async def login(self, user='', password=''):
-        async def do_login():
+        async def do_login(self):
+            # Provide the self argument explicitly instead of taking
+            # it from the surrounding closure. The self from the
+            # closure will not be correct if this do_login is called
+            # from a copy of the ZabbixAPI object created by the
+            # with_headers method.
             self.auth = ''
             self.auth = await self.user.login(user=user, password=password)
 
         self.do_login = do_login
-        await self.do_login()
+        await self.do_login(self)
 
     async def confimport(self, confformat='', source='', rules=''):
         return await self.configuration.import_(format=confformat, source=source, rules=rules)
