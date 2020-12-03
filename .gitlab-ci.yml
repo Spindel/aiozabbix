@@ -1,19 +1,22 @@
+%YAML 1.1
+---
 image: registry.gitlab.com/modioab/base-image/fedora-31/python:master
 
 stages:
-    - test
+  - test
 
 before_script:
-    - uname -a
+  - uname -a
 
 aiozabbix:check:
-    stage: test
-    script:
-        - pip3 install .[testing]
-        - python3 setup.py flake8
+  stage: test
+  script:
+    - pip3 install .[testing]
+    - python3 setup.py flake8
 
 aiozabbix:test:
-    stage: test
-    script:
-        - pip3 install .[testing]
-        - pytest --cov=aiozabbix
+  stage: test
+  script:
+    - pip3 install .[testing]
+    - pytest --cov=aiozabbix
+...
