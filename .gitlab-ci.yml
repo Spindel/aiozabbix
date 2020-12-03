@@ -1,22 +1,27 @@
 %YAML 1.1
 ---
-image: registry.gitlab.com/modioab/base-image/fedora-31/python:master
+# Keep the includes first to illustrate that definitions that everything that
+# follows override included definitions.
+include:
+  # Only run for branches and tags
+  # https://docs.gitlab.com/ee/ci/yaml/#workflowrules-templates
+  - template: 'Workflows/MergeRequest-Pipelines.gitlab-ci.yml'
+  - file: /.gitlab/ci/default.yml
+    project: ModioAB/agile
+    ref: master
 
-stages:
-  - test
+default:
+  image: $PYTHON_IMAGE
 
-before_script:
-  - uname -a
+  before_script:
+    - uname -a
+    - pip3 install .[testing]
 
 aiozabbix:check:
-  stage: test
   script:
-    - pip3 install .[testing]
     - python3 setup.py flake8
 
 aiozabbix:test:
-  stage: test
   script:
-    - pip3 install .[testing]
     - pytest --cov=aiozabbix
 ...
