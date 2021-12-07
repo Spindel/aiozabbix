@@ -6,9 +6,9 @@ include:
   # Only run for branches and tags
   # https://docs.gitlab.com/ee/ci/yaml/#workflowrules-templates
   - template: 'Workflows/MergeRequest-Pipelines.gitlab-ci.yml'
-  - file: /.gitlab/ci/default.yml
-    project: ModioAB/agile
-    ref: master
+  - file: /ci/default.yml
+    project: ModioAB/CI
+    ref: main
 
 default:
   image: $PYTHON_IMAGE
