@@ -150,8 +150,12 @@ class ZabbixAPI:
             # closure will not be correct if this do_login is called
             # from a copy of the ZabbixAPI object created by the
             # with_headers method.
-            self.auth = ''
-            self.auth = await self.user.login(user=user, password=password)
+
+            # We create a new instance to not set the "auth" cookie to
+            # something invalid while we are logging in.
+            sub = self.with_headers({})
+            sub.auth = ""
+            self.auth = await sub.user.login(user=user, password=password)
 
         self.do_login = do_login
         await self.do_login(self)
