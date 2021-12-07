@@ -19,7 +19,7 @@ default:
 
 aiozabbix:check:
   script:
-    - python3 setup.py flake8
+    - flake8 aiozabbix/
 
 aiozabbix:test:
   script:
