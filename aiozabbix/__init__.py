@@ -4,7 +4,7 @@
 # Original Python Library is Copyright (C) 2009 Brett Lentz brett.lentz(at)gmail(dot)com
 #
 # Copyright (C) 2011-2018 Luke Cyca me(at)lukecyca(dot)com
-# Copyright (C) 2018-2019 Modio AB
+# Copyright (C) 2018-2021 Modio AB
 #
 # This library is free software; you can redistribute it and/or modify
 # it under the terms of the GNU Lesser General Public License as
